@@ -1,7 +1,10 @@
+from tags.models import TagItem
 from django.contrib import admin, messages
+from django.contrib.contenttypes.admin import GenericTabularInline
+from django.urls import reverse
+from django.db.models.query import QuerySet
 from django.db.models.aggregates import Count
 from django.utils.html import format_html, urlencode
-from django.urls import reverse
 from . import models
 
 
@@ -19,6 +22,11 @@ class InventoryFilter(admin.SimpleListFilter):
             queryset.filter(inventory__lt=10)
 
 
+class TagInline(GenericTabularInline):
+    autocomplete_fields = ['tag']
+    model = TagItem
+
+
 @admin.register(models.Product)
 class ProductAdmin(admin.ModelAdmin):
     autocomplete_fields = ['collection']
@@ -26,6 +34,7 @@ class ProductAdmin(admin.ModelAdmin):
         'slug': ['title']
     }
     actions = ['clear_inventory']
+    inlines = [TagInline]
     list_display = ['title', 'unit_price',
                     'inventory_status', 'collection_title']
     list_editable = ['unit_price']
